@@ -1,0 +1,27 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.9.+'
+    }
+}
+
+ext.groupId = 'com.scompt.hidablepassword'
+ext.compileSdkVersion = 19
+ext.buildToolsVersion = "19.0.3"
+ext.minSdkVersion = 7;
+ext.targetSdkVersion = 19;
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.withType(Compile) {
+        options.encoding = "UTF-8"
+    }
+
+    version = '1.0-SNAPSHOT'
+}
