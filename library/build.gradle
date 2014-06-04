@@ -22,7 +22,7 @@ android {
 }
 
 ext {
-    artifactId = 'hidablepassword'
+    artifactId = 'library'
 }
 
 signing {
