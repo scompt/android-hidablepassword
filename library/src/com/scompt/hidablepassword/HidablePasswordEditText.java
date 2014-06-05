@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -46,6 +47,18 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
         init(inContext);
     }
 
+    @SuppressWarnings ("UnusedDeclaration")
+    public void setPaint(final Paint inPaint) {
+        if (inPaint == null) {
+            throw new NullPointerException("Paint must not be null");
+        }
+
+        mHideDrawable.setPaint(inPaint);
+        mShowDrawable.setPaint(inPaint);
+
+        updateShowHideDrawable();
+    }
+
     @SuppressLint ("ClickableViewAccessibility")
     @Override
     public boolean onTouch(final View inView, final MotionEvent inEvent) {
@@ -64,16 +77,12 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
                                             | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD;
                     }
                     setInputType(inputType);
-                    updateUpdateShowHideDrawable();
+                    updateShowHideDrawable();
                 }
                 return true;
             }
         }
         return false;
-    }
-
-    protected void configurePasswordTogglePaint(@SuppressWarnings ("UnusedParameters")
-                                                final Paint inPaint) {
     }
 
     private void init(final Context inContext) {
@@ -82,13 +91,10 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
         mHideDrawable = new TextDrawable(inContext.getString(R.string.hp__hidePassword));
         mShowDrawable = new TextDrawable(inContext.getString(R.string.hp__showPassword));
 
-        configurePasswordTogglePaint(mHideDrawable.mPaint);
-        configurePasswordTogglePaint(mShowDrawable.mPaint);
-
-        updateUpdateShowHideDrawable();
+        updateShowHideDrawable();
     }
 
-    private void updateUpdateShowHideDrawable() {
+    private void updateShowHideDrawable() {
         Drawable[] compoundDrawables = getCompoundDrawables();
         if (compoundDrawables == null || compoundDrawables.length < COMPOUND_DRAWABLE_COUNT) {
             compoundDrawables = new Drawable[COMPOUND_DRAWABLE_COUNT];
@@ -116,25 +122,27 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
     private static class TextDrawable extends Drawable {
 
         private final String mText;
-        private final Paint  mPaint;
+
+        private final Rect mRect = new Rect();
+        private Paint mPaint;
+        private int mWidth;
+        private int mHeight;
 
         public TextDrawable(final String inText) {
-
             mText = inText;
+            mPaint = generateDefaultPaint();
+            updateIntrinsicDimensions();
+        }
 
-            mPaint = new Paint();
-            mPaint.setColor(Color.WHITE);
-            mPaint.setTextSize(22f);
-            mPaint.setAntiAlias(true);
-            mPaint.setFakeBoldText(true);
-            mPaint.setShadowLayer(6f, 0, 0, Color.BLACK);
-            mPaint.setStyle(Paint.Style.FILL);
-            mPaint.setTextAlign(Paint.Align.LEFT);
+        private void updateIntrinsicDimensions() {
+            mPaint.getTextBounds(mText, 0, mText.length(), mRect);
+            mWidth = mRect.width();
+            mHeight = mRect.height();
         }
 
         @Override
         public void draw(final Canvas inCanvas) {
-            inCanvas.drawText(mText, 0, 0, mPaint);
+            inCanvas.drawText(mText, 0, mHeight, mPaint);
         }
 
         @Override
@@ -153,7 +161,28 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
         }
 
         @Override public int getIntrinsicWidth() {
-            return (int) this.mPaint.measureText(mText);
+            return mWidth;
+        }
+
+        @Override public int getIntrinsicHeight() {
+            return mHeight;
+        }
+
+        public void setPaint(Paint inPaint) {
+            mPaint = inPaint;
+            updateIntrinsicDimensions();
+        }
+
+        private Paint generateDefaultPaint() {
+            Paint paint = new Paint();
+            paint.setColor(Color.WHITE);
+            paint.setTextSize(22f);
+            paint.setAntiAlias(true);
+            paint.setFakeBoldText(true);
+            paint.setShadowLayer(6f, 0, 0, Color.BLACK);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setTextAlign(Paint.Align.LEFT);
+            return paint;
         }
     }
 }

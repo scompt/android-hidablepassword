@@ -7,13 +7,16 @@
 
     <!-- Initially shown -->
     <com.scompt.hidablepassword.HidablePasswordEditText android:layout_height="wrap_content"
-                                                        android:layout_width="match_parent" />
+                                                        android:layout_width="match_parent"
+                                                        android:id="@+id/hidable1"
+        />
 
 
     <!-- Initially hidden -->
     <com.scompt.hidablepassword.HidablePasswordEditText android:layout_height="wrap_content"
                                                         android:layout_width="match_parent"
                                                         android:inputType="textPassword"
+                                                        android:id="@+id/hidable2"
         />
 
 </LinearLayout>
