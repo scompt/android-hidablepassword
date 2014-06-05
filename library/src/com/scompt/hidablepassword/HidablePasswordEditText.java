@@ -117,6 +117,7 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
                             mOnPasswordVisibilityChangedListener.onPasswordHidden();
                         }
                     }
+                    requestFocus();
                 }
                 return true;
             }
