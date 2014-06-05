@@ -17,6 +17,22 @@ import android.widget.EditText;
 
 public class HidablePasswordEditText extends EditText implements View.OnTouchListener {
 
+    /**
+     * Callback interface for visibility of password.
+     */
+    public interface OnPasswordVisibilityChangedListener {
+
+        /**
+         * Called when the password is hidden.
+         */
+        void onPasswordHidden();
+
+        /**
+         * Called when the password is shown.
+         */
+        void onPasswordShown();
+    }
+
     private static final int LEFT   = 0;
     private static final int TOP    = 1;
     private static final int RIGHT  = 2;
@@ -26,6 +42,11 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
     private TextDrawable mHideDrawable;
     private TextDrawable mShowDrawable;
     private TextDrawable mActiveDrawable;
+
+    /**
+     * Listener used to dispatch state change events.
+     */
+    private OnPasswordVisibilityChangedListener mOnPasswordVisibilityChangedListener;
 
     @SuppressWarnings ("UnusedDeclaration")
     public HidablePasswordEditText(final Context inContext) {
@@ -59,6 +80,15 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
         updateShowHideDrawable();
     }
 
+    /**
+     * Register a callback to be invoked when the password visibility changes.
+     *
+     * @param inListener The callback that will run.
+     */
+    public void setOnPasswordVisibilityChangedListener(OnPasswordVisibilityChangedListener inListener) {
+        mOnPasswordVisibilityChangedListener = inListener;
+    }
+
     @SuppressLint ("ClickableViewAccessibility")
     @Override
     public boolean onTouch(final View inView, final MotionEvent inEvent) {
@@ -69,7 +99,8 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
             if (tappedX) {
                 if (inEvent.getAction() == MotionEvent.ACTION_UP) {
                     int inputType = getInputType();
-                    if (isPasswordHidden()) {
+                    final boolean passwordHidden = isPasswordHidden();
+                    if (passwordHidden) {
                         inputType = inputType & ~EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
                                               | EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
                     } else {
@@ -78,6 +109,14 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
                     }
                     setInputType(inputType);
                     updateShowHideDrawable();
+
+                    if (mOnPasswordVisibilityChangedListener != null) {
+                        if (passwordHidden) {
+                            mOnPasswordVisibilityChangedListener.onPasswordShown();
+                        } else {
+                            mOnPasswordVisibilityChangedListener.onPasswordHidden();
+                        }
+                    }
                 }
                 return true;
             }

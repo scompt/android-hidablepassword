@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.widget.Toast;
 
 import com.scompt.hidablepassword.HidablePasswordEditText;
 
@@ -30,5 +31,19 @@ public class SampleActivity extends Activity {
         paint.setTextAlign(Paint.Align.LEFT);
 
         hidable1.setPaint(paint);
+
+        final HidablePasswordEditText.OnPasswordVisibilityChangedListener listener =
+                new HidablePasswordEditText.OnPasswordVisibilityChangedListener() {
+                    @Override public void onPasswordHidden() {
+                        Toast.makeText(SampleActivity.this, "hidden", Toast.LENGTH_SHORT)
+                             .show();
+                    }
+
+                    @Override public void onPasswordShown() {
+                        Toast.makeText(SampleActivity.this, "shown", Toast.LENGTH_SHORT)
+                             .show();
+                    }
+                };
+        hidable1.setOnPasswordVisibilityChangedListener(listener);
     }
 }

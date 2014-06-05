@@ -6,7 +6,8 @@ A `EditText` subclass that allows the user to toggle the visibility of the passw
 Features
 --------
 
-Clicking on show/hide toggles the visibility of the password.
+* Clicking on show/hide toggles the visibility of the password.
+* A listener can be registered to be invoked when the password visibility is changed.
 
 Usage
 -----
