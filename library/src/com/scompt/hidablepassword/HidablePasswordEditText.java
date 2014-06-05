@@ -1,6 +1,7 @@
 package com.scompt.hidablepassword;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -98,31 +100,47 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
             boolean tappedX = inEvent.getX() > xLeft;
             if (tappedX) {
                 if (inEvent.getAction() == MotionEvent.ACTION_UP) {
-                    int inputType = getInputType();
-                    final boolean passwordHidden = isPasswordHidden();
-                    if (passwordHidden) {
-                        inputType = inputType & ~EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
-                                              | EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
-                    } else {
-                        inputType = inputType & ~EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                                            | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD;
-                    }
-                    setInputType(inputType);
-                    updateShowHideDrawable();
-
-                    if (mOnPasswordVisibilityChangedListener != null) {
-                        if (passwordHidden) {
-                            mOnPasswordVisibilityChangedListener.onPasswordShown();
-                        } else {
-                            mOnPasswordVisibilityChangedListener.onPasswordHidden();
-                        }
-                    }
-                    requestFocus();
+                    toggleVisibility();
                 }
                 return true;
             }
         }
         return false;
+    }
+
+    private void toggleVisibility() {
+        int inputType = getInputType();
+        final boolean passwordHidden = isPasswordHidden();
+        final boolean isNumber = areBitsSet(inputType, EditorInfo.TYPE_CLASS_NUMBER);
+
+        if (isNumber) {
+            if (passwordHidden) {
+                inputType = inputType & ~EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD;
+            } else {
+                inputType = inputType | EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD;
+            }
+
+        } else {
+            if (passwordHidden) {
+                inputType = inputType & ~EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
+                                    | EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+            } else {
+                inputType = inputType & ~EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                                    | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD;
+            }
+        }
+
+        setInputType(inputType);
+        updateShowHideDrawable();
+
+        if (mOnPasswordVisibilityChangedListener != null) {
+            if (passwordHidden) {
+                mOnPasswordVisibilityChangedListener.onPasswordShown();
+            } else {
+                mOnPasswordVisibilityChangedListener.onPasswordHidden();
+            }
+        }
+        requestFocus();
     }
 
     private void init(final Context inContext) {
@@ -151,12 +169,25 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
                                                 mActiveDrawable, compoundDrawables[BOTTOM]);
     }
 
-    private boolean isPasswordHidden() {
+     @TargetApi (Build.VERSION_CODES.HONEYCOMB)
+     private boolean isPasswordHidden() {
         final int inputType = getInputType();
-        return (inputType & EditorInfo.TYPE_TEXT_VARIATION_PASSWORD)
-                       == EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
-                       && (inputType & EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
-                                  != EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+
+        boolean isTextPassword = areBitsSet(inputType, EditorInfo.TYPE_TEXT_VARIATION_PASSWORD)
+                                         && !areBitsSet(inputType, EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+
+        boolean isNumberPassword = false;
+        //noinspection ConstantConditions
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            isNumberPassword = areBitsSet(inputType, EditorInfo.TYPE_CLASS_NUMBER)
+                                       && areBitsSet(inputType, EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD);
+        }
+
+        return isTextPassword || isNumberPassword;
+    }
+
+    private boolean areBitsSet(final int inInput, final int inBits) {
+        return (inInput & inBits) == inBits;
     }
 
     private static class TextDrawable extends Drawable {

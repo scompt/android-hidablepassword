@@ -19,4 +19,11 @@
                                                         android:id="@+id/hidable2"
         />
 
+    <!-- Number password -->
+    <com.scompt.hidablepassword.HidablePasswordEditText android:layout_height="wrap_content"
+                                                        android:layout_width="match_parent"
+                                                        android:inputType="numberPassword"
+                                                        android:id="@+id/hidable3"
+        />
+
 </LinearLayout>
