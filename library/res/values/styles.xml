@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="Widget" />
+
+    <!-- Base theme for the HidablePasswordEditText. -->
+    <style name="Widget.HidablePassword">
+        <item name="hpShowPassword">@string/hp__showPassword</item>
+        <item name="hpHidePassword">@string/hp__hidePassword</item>
+    </style>
+
+</resources>

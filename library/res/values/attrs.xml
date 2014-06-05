@@ -1,0 +1,15 @@
+<resources>
+
+    <!-- Reference to a style for the HidablePasswordEditText. -->
+    <attr name="hidablePasswordStyle" format="reference" />
+
+    <!-- Styleables used for styling the HidablePasswordEditText. -->
+    <declare-styleable name="HidablePasswordEditText">
+        <!-- String displayed when the password is hidden. -->
+        <attr name="hpShowPassword" format="string" />
+
+        <!-- String displayed when the password is shown. -->
+        <attr name="hpHidePassword" format="string" />
+    </declare-styleable>
+
+</resources>

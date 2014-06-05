@@ -3,6 +3,7 @@ package com.scompt.hidablepassword;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -53,13 +54,13 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
     @SuppressWarnings ("UnusedDeclaration")
     public HidablePasswordEditText(final Context inContext) {
         super(inContext);
-        init(inContext);
+        init(inContext, null);
     }
 
     @SuppressWarnings ("UnusedDeclaration")
     public HidablePasswordEditText(final Context inContext, final AttributeSet inAttrs) {
         super(inContext, inAttrs);
-        init(inContext);
+        init(inContext, inAttrs);
     }
 
     @SuppressWarnings ("UnusedDeclaration")
@@ -67,7 +68,7 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
                                    final int inDefStyle) {
 
         super(inContext, inAttrs, inDefStyle);
-        init(inContext);
+        init(inContext, inAttrs);
     }
 
     @SuppressWarnings ("UnusedDeclaration")
@@ -108,6 +109,7 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
         return false;
     }
 
+    @TargetApi (Build.VERSION_CODES.HONEYCOMB)
     private void toggleVisibility() {
         int inputType = getInputType();
         final boolean passwordHidden = isPasswordHidden();
@@ -143,11 +145,32 @@ public class HidablePasswordEditText extends EditText implements View.OnTouchLis
         requestFocus();
     }
 
-    private void init(final Context inContext) {
+    private void init(final Context inContext, final AttributeSet inAttrs) {
         setOnTouchListener(this);
 
-        mHideDrawable = new TextDrawable(inContext.getString(R.string.hp__hidePassword));
-        mShowDrawable = new TextDrawable(inContext.getString(R.string.hp__showPassword));
+        String hidePasswordString = null;
+        String showPasswordString = null;
+
+        TypedArray a = inContext.obtainStyledAttributes(inAttrs,
+                                                        R.styleable.HidablePasswordEditText,
+                                                        R.attr.hidablePasswordStyle,
+                                                        R.style.Widget_HidablePassword);
+
+        if (a != null) {
+            hidePasswordString = a.getString(R.styleable.HidablePasswordEditText_hpHidePassword);
+            showPasswordString = a.getString(R.styleable.HidablePasswordEditText_hpShowPassword);
+            a.recycle();
+        }
+
+        if (hidePasswordString == null) {
+            hidePasswordString = inContext.getString(R.string.hp__hidePassword);
+        }
+        if (showPasswordString == null) {
+            showPasswordString = inContext.getString(R.string.hp__showPassword);
+        }
+
+        mHideDrawable = new TextDrawable(hidePasswordString);
+        mShowDrawable = new TextDrawable(showPasswordString);
 
         updateShowHideDrawable();
     }
