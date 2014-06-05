@@ -10,7 +10,7 @@ buildscript {
 
 ext.groupId = 'com.scompt.hidablepassword'
 ext.compileSdkVersion = 19
-ext.buildToolsVersion = "19.0.3"
+ext.buildToolsVersion = "19.1.0"
 ext.minSdkVersion = 7;
 ext.targetSdkVersion = 19;
 
@@ -23,5 +23,5 @@ allprojects {
         options.encoding = "UTF-8"
     }
 
-    version = '1.0-SNAPSHOT'
+    version = '1.0'
 }
