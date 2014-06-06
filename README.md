@@ -3,6 +3,9 @@ HidablePassword
 
 A `EditText` subclass that allows the user to toggle the visibility of the password.
 
+![Screenshot](https://raw.githubusercontent.com/scompt/android-hidablepassword/master/hidablepassword_demo.gif)
+
+
 Features
 --------
 
